@@ -1,1 +1,61 @@
 <h3> Django Paystack Transfer</h3>
+
+
+
+
+{% if result %}
+<input type="number" min="0" placeholder="Enter Account Number" onchange="getAccountNumber(event)" >
+<br/>
+<br/>
+<select onchange='getBankCode(event)'>
+	<option value="----">----</option>
+	{% for bank in result %}
+		  <option value='{{bank.code}}'>{{bank.name}}</option>
+		  
+  {% endfor %}
+</select>
+
+<button onclick='verify()'>Submit</button>
+{% else %}
+		<h3>{{error}}</h3>
+
+{% endif %}
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script type="text/javascript">
+		var bankcode;
+		var accountnumber;
+
+		getBankCode=(event)=>{
+			bankcode = event.target.value;
+
+		}
+
+
+		getAccountNumber=(event)=>{
+			accountnumber = event.target.value;
+		}
+
+		verify=()=>{
+			
+			if(bankcode != undefined && bankcode != "----" && accountnumber != "" && accountnumber != undefined){
+				 $.post("{% url 'paystacktransapp:checkaccount' %}",
+										  {
+										  	csrfmiddlewaretoken: "{{csrf_token}}",
+										    bankcode: bankcode,
+										    accountnumber: accountnumber
+										  },
+										  function(data, status){
+										    alert(`${data.data.account_name}\n${data.data.account_number}`);
+										   
+										  });
+			}
+			else{
+				alert('please fill');
+			}
+
+		}
+
+</script>
