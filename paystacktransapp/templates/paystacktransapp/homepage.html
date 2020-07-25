@@ -15,7 +15,13 @@
   {% endfor %}
 </select>
 
-<button onclick='verify()'>Submit</button>
+<button onclick='verify()'>Verify Account</button>
+<br/>
+<div id="amount" style="display:none">
+	<input type="number" min="0" onchange="getAmount(event)" />
+	<br/>
+	<button onclick="transfer()">Credit Me!</button>
+</div>	
 {% else %}
 		<h3>{{error}}</h3>
 
@@ -27,6 +33,7 @@
 <script type="text/javascript">
 		var bankcode;
 		var accountnumber;
+		var amount;
 
 		getBankCode=(event)=>{
 			bankcode = event.target.value;
@@ -36,6 +43,10 @@
 
 		getAccountNumber=(event)=>{
 			accountnumber = event.target.value;
+		}
+
+		getAmount=(event)=>{
+			amount = event.target.value;
 		}
 
 		verify=()=>{
@@ -49,6 +60,26 @@
 										  },
 										  function(data, status){
 										    alert(`${data.data.account_name}\n${data.data.account_number}`);
+										    var dis = document.getElementById('amount');
+										    dis.style.display = 'inline-block';
+										   
+										  });
+			}
+			else{
+				alert('please fill');
+			}
+
+		}
+
+		transfer=()=>{
+			if(bankcode != undefined && bankcode != "----" && accountnumber != "" && accountnumber != undefined && amount !=undefined && amount != ""){
+				 $.post("{% url 'paystacktransapp:generate_receipt' %}",
+										  {
+										  	csrfmiddlewaretoken: "{{csrf_token}}",
+										    amount:amount
+										  },
+										  function(data, status){
+										    alert(data.message);
 										   
 										  });
 			}
